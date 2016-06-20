@@ -1,39 +1,47 @@
-import {Component} from '@angular/core';
+import { Component, OnInit  } from '@angular/core';
+import { Hero } from './hero';
+import { HeroService } from './hero.service';
+import { HeroDetailComponent } from './hero-detail.component';
 
-const NAMES : Names[] = [
-{ id: 1, firstname: 'hi'},
-{ id: 2, firstname: 'hi2'},
-{ id: 3, firstname: 'hi3'},
-{ id: 4, firstname: 'hi4'},
-{ id: 5, firstname: 'hi5'},
-{ id: 6, firstname: 'hi6'}
-];
-//1.
 @Component({
-    selector: 'my-app',
-    template: `
+  selector: 'my-app',
+  template: `
     <h1>{{title}}</h1>
-    <h2>{{name.firstname}} man!</h2>
-    <h3>{{name.id}}</h3>
-    <div>
-    	<label>name: </label>
-    	<input [(ngModel)]="name.firstname" placeholder="name">
-    </div>
     <h2>My Heroes</h2>
-	<ul class="heroes">
-	 <li *ngFor="let name of names">
-	 	<span class="badge">{{name.id}}</span> {{name.firstname}}
-	</ul>
-    `
+    <ul class="heroes">
+      <li *ngFor="let hero of heroes"
+        [class.selected]="hero === selectedHero"
+        (click)="onSelect(hero)">
+        <span class="badge">{{hero.id}}</span> {{hero.name}}
+      </li>
+    </ul>
+    <my-hero-detail [hero]="selectedHero"></my-hero-detail>
+  `,
+  styles: [`
+    .selected {
+      background-color: #CFD8DC !important;
+      color: white;
+    }
+  `],
+  directives: [HeroDetailComponent],
+  providers: [HeroService]
 })
-//3.
-export class AppComponent {
-	title = 'hi yo';
-	names: NAMES
-}
+export class AppComponent implements OnInit {
+  title = 'Tour of Heroes';
+  heroes: Hero[];
+  selectedHero: Hero;
+  
+  constructor(private heroService: HeroService) { }
 
-//2.
-export class Name {
-	id: number;
-	firstname: string;
+  ngOnInit() {
+    this.getHeroes();
+  }
+
+  getHeroes() {
+    this.heroService.getHeroesSlowly().then(heroes => this.heroes = heroes);
+  }
+
+  onSelect(hero: Hero) { this.selectedHero = hero; }
+
+
 }
